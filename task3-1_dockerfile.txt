@@ -1,0 +1,18 @@
+#install java
+FROM openjdk:8
+
+#installs maven
+RUN sudo yum update
+RUN sudo yum  install -y maven
+
+# use copy directive to copy from host to image
+COPY . /app
+
+cd app
+
+RUN mvn package
+
+# build the image 
+
+docker build -t myapp .
+
