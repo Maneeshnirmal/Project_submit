@@ -1,0 +1,20 @@
+The build of maven is already formed and the output is in .war format so here it changes to tomcat output.
+
+#install tomcat
+
+FROM tomcat:9.0
+# use copy directive to copy war image to host 
+COPY app.war /usr/local/tomcat/webapps/
+
+#run the tomcat script
+#"Catalina" is the script that is actually responsible for starting and stoping Tomcat
+CMD ["catalina.sh", "run"]
+
+# build the image
+docker build -t my-tomcat-app .
+
+# run the code
+
+docker run -dt --name my-tomcat-container -p 8080:8080 my-tomcat-app
+
+

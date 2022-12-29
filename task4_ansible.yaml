@@ -1,0 +1,43 @@
+---
+- name: Deploy app to Kubernetes
+  vars:
+    image: maneeshnirmal/myapp:v1
+  tasks:
+  - name: Create pod
+    k8s:
+      api_version: v1
+      kind: Pod
+      name: myapp-pod
+      namespace: default
+      state: present
+      containers:
+      - name: myapp
+        image: "{{ image }}"
+        ports:
+        - containerPort: 8080
+  - name: Create deployment
+    k8s:
+      api_version: apps/v1
+      kind: Deployment
+      name: myapp-deployment
+      namespace: default
+      state: present
+      containers:
+      - name: myapp
+        image: "{{ image }}"
+        ports:
+        - containerPort: 8080
+  - name: Create service
+    k8s:
+      api_version: v1
+      kind: Service
+      name: myapp-service
+      namespace: default
+      state: present
+      type: NodePort
+      selector:
+        app: myapp
+      ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 8080

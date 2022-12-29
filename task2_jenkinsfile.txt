@@ -1,0 +1,28 @@
+pipeline {
+    agent {
+        docker {
+            image 'openjdk:8'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker build -t my-maven-app .'
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-registry', variable: 'REGISTRY_PASSWORD')]) {
+                    sh "docker login -u jenkins -p $REGISTRY_PASSWORD"
+                    sh 'docker push my-maven-app'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'docker run -dt --name maven-app -p 8080:80 my-maven-app'
+            }
+        }
+    }
+}
